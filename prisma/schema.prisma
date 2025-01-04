@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  url       String   @unique
+  title     String
+  content   String
+  metadata  Json?
+  createdAt DateTime @default(now())
+  // indexes   Index[]
+}
+
+// model Index {
+//   id         String  @id @default(uuid())
+//   documentId String
+//   term       String
+//   frequency  Int
+//   tfIdf      Float?
+//   document   Document @relation(fields: [documentId], references: [id])
+// }
+
+// model User {
+//   id          String  @id @default(uuid())
+//   email       String  @unique
+//   preferences Json?
+//   queries     Query[]
+// }
+
+// model Query {
+//   id        String   @id @default(uuid())
+//   userId    String?
+//   queryText String
+//   createdAt DateTime @default(now())
+//   user      User?    @relation(fields: [userId], references: [id])
+// }
+
+// model Synonym {
+//   id      String @id @default(uuid())
+//   term    String
+//   synonym String
+// }
+
+// model Misspelling {
+//   id           String @id @default(uuid())
+//   incorrectTerm String
+//   correctTerm   String
+// }
