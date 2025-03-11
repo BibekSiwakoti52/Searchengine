@@ -10,52 +10,55 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgresql" 
   url      = env("DATABASE_URL")
 }
 
-model Document {
-  id        String   @id @default(uuid())
+model Page {
+  id        Int      @id @default(autoincrement())
   url       String   @unique
   title     String
   content   String
-  metadata  Json?
-  createdAt DateTime @default(now())
-  // indexes   Index[]
+  crawledAt DateTime
+  updatedAt DateTime @updatedAt
+  terms     DocumentTerm[]
 }
 
-// model Index {
-//   id         String  @id @default(uuid())
-//   documentId String
-//   term       String
-//   frequency  Int
-//   tfIdf      Float?
-//   document   Document @relation(fields: [documentId], references: [id])
-// }
+model Term {
+  id             Int            @id @default(autoincrement())
+  term           String         @unique
+  totalDocuments Int            @default(0) // For IDF calculation
+  documentTerms  DocumentTerm[]
+}
 
-// model User {
-//   id          String  @id @default(uuid())
-//   email       String  @unique
-//   preferences Json?
-//   queries     Query[]
-// }
+model DocumentTerm {
+  page   Page   @relation(fields: [pageId], references: [id])
+  term   Term   @relation(fields: [termId], references: [id])
+  pageId Int
+  termId Int
+  tf     Float  // Term frequency in the document
+  idf    Float  // Inverse document frequency
 
-// model Query {
-//   id        String   @id @default(uuid())
-//   userId    String?
-//   queryText String
-//   createdAt DateTime @default(now())
-//   user      User?    @relation(fields: [userId], references: [id])
-// }
+  @@id([pageId, termId])
+}
 
-// model Synonym {
-//   id      String @id @default(uuid())
-//   term    String
-//   synonym String
-// }
+model Synonym {
+  id       Int    @id @default(autoincrement())
+  rootTerm String
+  synonym  String
+}
 
-// model Misspelling {
-//   id           String @id @default(uuid())
-//   incorrectTerm String
-//   correctTerm   String
-// }
+model CrawlHistory {
+  id         Int      @id @default(autoincrement())
+  url        String
+  status     String   // e.g., "success", "failed"
+  startedAt  DateTime
+  finishedAt DateTime
+}
+
+model SearchQuery {
+  id          Int      @id @default(autoincrement())
+  query       String
+  resultCount Int
+  createdAt   DateTime @default(now())
+}
